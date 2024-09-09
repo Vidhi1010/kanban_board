@@ -13,7 +13,8 @@ dist-ssr
 *.local
 
 # Secret filesclear
-
+.env
+ 
 
 
 # Editor directories and files
