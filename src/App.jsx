@@ -1,40 +1,82 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import Header from './components/Header';
 import ActionList from './components/ActionList';
 import TodoList from './components/TodoList';
 import { TodoProvider } from './context/TodoContext';
 
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey:import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+};
 
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 const App = () => {
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [todos, setTodos] = useState([]);
 
+  // Show the task creation form
   const handleCreateTaskClick = () => {
     setShowTaskForm(true);
   };
 
+  // Close the modal form
   const handleCloseModal = () => {
     setShowTaskForm(false);
   };
 
-  const addTodo = (todo) => {
-    setTodos((prev) => [{ id: Date.now(), ...todo }, ...prev]);
+  // Add new todo and save to Firestore
+  const addTodo = async (todo) => {
+    try {
+      await addDoc(collection(db, "todos"), {
+        ...todo,
+        createdAt: new Date(),
+      });
+    } catch (error) {
+      console.error("Error adding document: ", error);
+    }
   };
 
-  const updateTodo = (id, todo) => {
-    setTodos((prev) => prev.map((prevTodo) => (prevTodo.id === id ? todo : prevTodo)));
+  // Update todo in Firestore
+  const updateTodo = async (id, updatedTodo) => {
+    try {
+      const todoRef = doc(db, "todos", id);
+      await updateDoc(todoRef, updatedTodo);
+    } catch (error) {
+      console.error("Error updating document: ", error);
+    }
   };
 
-  const deleteTodo = (id) => {
-    setTodos((prev) => prev.filter((todo) => todo.id !== id));
+  // Delete todo from Firestore
+  const deleteTodo = async (id) => {
+    try {
+      await deleteDoc(doc(db, "todos", id));
+    } catch (error) {
+      console.error("Error deleting document: ", error);
+    }
   };
 
-  const toggleComplete = (id) => {
-    setTodos((prev) => prev.map((prevTodo) =>
-      prevTodo.id === id ? { ...prevTodo, completed: !prevTodo.completed } : prevTodo
-    ));
-  };
+  // Sync todos from Firestore in real-time
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'todos'), (snapshot) => {
+      const todosList = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setTodos(todosList);
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Filter todos by status
   const todoTasks = todos.filter((todo) => todo.status === 'Todo');
@@ -43,7 +85,7 @@ const App = () => {
 
   return (
     <>
-      <TodoProvider value={{ todos, addTodo, updateTodo, deleteTodo, toggleComplete }}>
+      <TodoProvider value={{ todos, addTodo, updateTodo, deleteTodo }}>
         <Header />
         <div className="w-full min-h-screen flex flex-col items-center bg-slate-100">
           <div className="w-2/3 h-24 border bg-white mt-9 flex items-center justify-between px-4 rounded-xl">
