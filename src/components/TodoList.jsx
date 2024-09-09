@@ -9,6 +9,7 @@ function TodoList({ todo }) {
     const [priority, setPriority] = useState(todo.priority);
     const [showPriorityDropdown, setShowPriorityDropdown] = useState(false);
     const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
 
     const { updateTodo, deleteTodo } = useTodo();
 
@@ -32,6 +33,18 @@ function TodoList({ todo }) {
 
     const handleDelete = () => {
         deleteTodo(todo.id);
+    };
+
+    const handleEdit = () => {
+        setIsEditing((prev) => !prev);
+        if (isEditing) {
+            updateTodo(todo.id, {
+                ...todo,
+                title,
+                description,
+                date,
+            });
+        }
     };
 
     useEffect(() => {
@@ -97,7 +110,7 @@ function TodoList({ todo }) {
                         className={`font-semibold text-lg outline-none w-full bg-transparent rounded-lg ${todo.completed ? 'line-through' : ''}`}
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        readOnly={todo.completed}
+                        readOnly={!isEditing || todo.completed}
                     />
 
                     <div className="relative flex items-center gap-x-2 status-dropdown">
@@ -130,7 +143,7 @@ function TodoList({ todo }) {
                     className={`outline-none w-full bg-transparent rounded-lg ${todo.completed ? 'line-through' : ''}`}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    readOnly={todo.completed}
+                    readOnly={!isEditing || todo.completed}
                 />
             </div>
 
@@ -144,13 +157,20 @@ function TodoList({ todo }) {
                         className={`outline-none rounded-lg ${todo.completed ? 'border-transparent' : 'px-2'}`}
                         value={date}
                         onChange={(e) => setDate(e.target.value)}
-                        readOnly={todo.completed}
+                        readOnly={!isEditing || todo.completed}
                     />
                 </div>
 
-                <div className="flex flex-col mt-2 gap-y-1">
+                <div className="flex mt-2 gap-x-2">
                     <button
-                        className="inline-flex w-full h-8 rounded-lg text-sm text-white bg-red-600 hover:bg-red-700 justify-center items-center"
+                        className="flex-1 h-8 rounded-lg text-sm text-white bg-green-600 hover:bg-green-700"
+                        onClick={handleEdit}
+                        disabled={todo.completed}
+                    >
+                        {isEditing ? 'Save' : 'Edit'}
+                    </button>
+                    <button
+                        className="flex-1 h-8 rounded-lg text-sm text-white bg-red-600 hover:bg-red-700"
                         onClick={handleDelete}
                         disabled={todo.completed}
                     >

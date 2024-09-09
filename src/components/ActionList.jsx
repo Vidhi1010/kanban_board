@@ -10,7 +10,7 @@ const ActionList = ({ handleCloseModal }) => {
     const [description, setDescription] = useState('');
     const [date, setDate] = useState('');
     const [status, setStatus] = useState('Todo');
-    const [priority, setPriority] = useState('Medium');
+    const [priority, setPriority] = useState('Low');
 
     const handleCreateTaskClick = () => {
         if (!title || !description || !date) {
@@ -24,7 +24,7 @@ const ActionList = ({ handleCloseModal }) => {
         setDescription('');
         setDate('');
         setStatus('Todo');
-        setPriority('Medium');
+        setPriority('Low');
         handleCloseModal();
     };
 
