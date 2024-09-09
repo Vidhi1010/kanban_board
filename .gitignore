@@ -12,7 +12,8 @@ dist
 dist-ssr
 *.local
 
-# Environment variables
+# Secret filesclear
+
 .env  
 
 # Editor directories and files
