@@ -102,7 +102,7 @@ const App = () => {
 
           {/* Main Page Content */}
           <div className='w-2/3 mt-4 flex gap-4'>
-            <div className="w-1/3 bg-white">
+            <div className="w-1/3 bg-white h-full">
               <div className='text-center flex items-center justify-center bg-violet-800 text-white p-3 rounded-t-lg'>
                 TODO
               </div>
@@ -117,7 +117,7 @@ const App = () => {
               </div>
             </div>
 
-            <div className="w-1/3 bg-white">
+            <div className="w-1/3 bg-white h-full">
               <div className='text-center flex items-center justify-center bg-yellow-300 text-white p-3 rounded-t-lg'>
                 IN PROGRESS
               </div>
@@ -132,7 +132,7 @@ const App = () => {
               </div>
             </div>
 
-            <div className="w-1/3 bg-white">
+            <div className="w-1/3 bg-white h-full">
               <div className='text-center flex items-center justify-center bg-green-600 text-white p-3 rounded-t-lg'>
                 COMPLETED
               </div>
